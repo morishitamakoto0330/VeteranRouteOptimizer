@@ -7,8 +7,8 @@ class Agent():
     def __init__(self, env):
         self.actions = env.actions
 
-    def policy(self, state):
-        return random.choice(self.actions)
+    def policy(self, env):
+        return random.choice(env.actions)
 
 
 def main():
@@ -17,6 +17,7 @@ def main():
         points = [(float(row[0]), float(row[1])) for row in reader if len(row) != 0]
 
     print('sample route ==========================')
+    print('{0} points'.format(len(points)))
     print('longitude, latitude')
     for p in points:
         print('({0}, {1})'.format(p[0], p[1]))
@@ -30,7 +31,7 @@ def main():
         total_reward = 0
 
         while env.can_action_at(state):
-            action = agent.policy(state)
+            action = agent.policy(env)
             next_state, reward = env.step(action)
             total_reward += reward
             state = next_state

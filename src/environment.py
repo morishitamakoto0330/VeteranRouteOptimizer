@@ -45,9 +45,17 @@ class Environment():
     @property
     def actions(self):
         visited = self.visited_points
-        visited.append((self.agent_state.lon, self.agent_state.lat))
+        not_visited = []
 
-        return [p for p in self.points if p not in visited]
+        for p in self.points:
+            isVisited = False
+            for v in visited:
+                if p[0] == v[0] and p[1] == v[1]:
+                    isVisited = True
+            if not isVisited:
+                not_visited.append(p)
+
+        return not_visited
 
     @property
     def states(self):
@@ -62,6 +70,11 @@ class Environment():
         if not self.can_action_at(state):
             return transition_probs
 
+        if len(self.actions) == 1:
+            next_state = self._move(state, self.actions[0])
+            transition_probs[next_state] = 1.0
+            return transition_probs
+
         for a in self.actions:
             prob = 0.0
             if a == action:
@@ -70,15 +83,12 @@ class Environment():
                 prob = (1.0 - self.move_prob)/(len(self.actions) - 1)
 
             next_state = self._move(state, a)
-
-            if next_state not in transition_probs:
-                transition_probs[next_state] = prob
-            else:
-                transition_probs[next_state] += prob
+            transition_probs[next_state] = prob
 
         return transition_probs
 
     def can_action_at(self, state):
+        # Agent visited all point or not
         return len(self.visited_points) < len(self.points)
 
     def _move(self, state, action):
@@ -121,7 +131,6 @@ class Environment():
         return next_state, reward
 
     def transit(self, state, action):
-        """
         transition_probs = self.transit_func(state, action)
         if len(transition_probs) == 0:
             return None, 0
@@ -133,9 +142,8 @@ class Environment():
             probs.append(transition_probs[s])
 
         next_state = np.random.choice(next_states, p=probs)
-        """
 
-        next_state = self._move(state, action)
+        #next_state = self._move(state, action)
 
         if state != next_state:
             reward = self.reward_func(state, next_state)
