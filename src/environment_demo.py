@@ -28,11 +28,10 @@ def main():
     for i in range(10):
         state = env.reset()
         total_reward = 0
-        done = False
 
-        while not done:
+        while env.can_action_at(state):
             action = agent.policy(state)
-            next_state, reward, done = env.step(action)
+            next_state, reward = env.step(action)
             total_reward += reward
             state = next_state
 

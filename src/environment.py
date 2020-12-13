@@ -44,7 +44,10 @@ class Environment():
 
     @property
     def actions(self):
-        return [p for p in self.points if p not in self.visited_points]
+        visited = self.visited_points
+        visited.append((self.agent_state.lon, self.agent_state.lat))
+
+        return [p for p in self.points if p not in visited]
 
     @property
     def states(self):
@@ -55,7 +58,6 @@ class Environment():
 
     def transit_func(self, state, action):
         transition_probs = {}
-        done = False
 
         if not self.can_action_at(state):
             return transition_probs
@@ -67,26 +69,25 @@ class Environment():
             else:
                 prob = (1.0 - self.move_prob)/(len(self.actions) - 1)
 
-            next_state, done = self._move(state, a)
+            next_state = self._move(state, a)
 
             if next_state not in transition_probs:
                 transition_probs[next_state] = prob
             else:
                 transition_probs[next_state] += prob
 
-        return transition_probs, done
+        return transition_probs
 
     def can_action_at(self, state):
         return len(self.visited_points) < len(self.points)
 
     def _move(self, state, action):
         if not self.can_action_at(state):
-            #raise Exception("Can't move from here!")
-            return None, False
+            return None
 
         next_state = State(action[0], action[1])
 
-        return next_state, True
+        return next_state
 
     def reward_func(self, current_state, next_state):
         reward = self.default_reward
@@ -94,29 +95,36 @@ class Environment():
         _lon = current_state.lon - next_state.lon
         _lat = current_state.lat - next_state.lat
 
-        reward += 1.0 / np.sqrt(_lon*_lon + _lat*_lat)
+        if _lon == 0.0 and _lat == 0.0:
+            raise Exception('Agent has to move somewhere, but Agent is stopped.')
+        else:
+            reward += 1.0 / np.sqrt(_lon*_lon + _lat*_lat)
 
         return reward
 
     def reset(self):
+        # start point
         point = self.points[0]
+        # set initial value
+        self.visited_points = []
         self.visited_points.append(point)
-
         self.agent_state.lon = point[0]
         self.agent_state.lat = point[1]
 
+        return self.agent_state
+
     def step(self, action):
-        next_state, reward, done = self.transit(self.agent_state, action)
+        next_state, reward = self.transit(self.agent_state, action)
         if next_state is not None:
             self.agent_state = next_state
 
-        return next_state, reward, done
+        return next_state, reward
 
     def transit(self, state, action):
         """
-        transition_probs, done = self.transit_func(state, action)
+        transition_probs = self.transit_func(state, action)
         if len(transition_probs) == 0:
-            return None, None, True
+            return None, 0
 
         next_states = []
         probs = []
@@ -126,12 +134,17 @@ class Environment():
 
         next_state = np.random.choice(next_states, p=probs)
         """
-        next_state, done = self._move(state, action)
-        reward = self.reward_func(state, next_state)
 
-        self.visited_points.append((next_state.lon, next_state.lat))
-        
-        return next_state, reward, done
+        next_state = self._move(state, action)
+
+        if state != next_state:
+            reward = self.reward_func(state, next_state)
+            self.visited_points.append((next_state.lon, next_state.lat))
+
+            return next_state, reward
+
+        else:
+            return None, 0
 
 
 
