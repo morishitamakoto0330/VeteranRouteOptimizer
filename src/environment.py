@@ -106,7 +106,8 @@ class Environment():
         _lat = current_state.lat - next_state.lat
 
         if _lon == 0.0 and _lat == 0.0:
-            raise Exception('Agent has to move somewhere, but Agent is stopped.')
+            reward -= 1000
+            #raise Exception('Agent has to move somewhere, but Agent is stopped.')
         else:
             reward += 1.0 / np.sqrt(_lon*_lon + _lat*_lat)
 

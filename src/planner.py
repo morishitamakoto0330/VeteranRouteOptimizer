@@ -15,17 +15,19 @@ class Planner():
         transition_probs = self.env.transit_func(state, action)
         for next_state in transition_probs:
             prob = transition_probs[next_state]
-            reward, _ = self.env.reward_func(next_state)
+            reward = self.env.reward_func(state, next_state)
             yield prob, next_state, reward
 
     def dict_to_points(self, state_reward_dict):
         points = []
-        for i in range(self.env.lon_length):
-            lat = [0] * self.env.lat_length
-            points.append(lat)
+        for i in range(len(self.env.points)):
+            p = [0]
+            points.append(p)
 
         for s in state_reward_dict:
-            points[s.lat][s.lon] = state_reward_dict[s]
+            for index, p in enumerate(self.env.points):
+                if p[0] == s.lon and p[1] == s.lat:
+                    points[index] = state_reward_dict[s]
 
         return points
 
@@ -43,7 +45,7 @@ class ValueIterationPlanner(Planner):
 
         while True:
             delta = 0
-            self.log.append(self.dict_to_points(V))
+            #self.log.append(self.dict_to_points(V))
             for s in V:
                 if not self.env.can_action_at(s):
                     continue
