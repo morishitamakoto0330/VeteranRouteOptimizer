@@ -5,7 +5,6 @@ class Planner():
         self.log = []
 
     def initialize(self):
-        self.env.reset()
         self.log = []
 
     def plan(self, gamma=0.9, threshold=0.0001):
@@ -21,7 +20,7 @@ class Planner():
     def dict_to_points(self, state_reward_dict):
         points = []
         for i in range(len(self.env.points)):
-            p = [0]
+            p = 0
             points.append(p)
 
         for s in state_reward_dict:

@@ -61,7 +61,8 @@ class Environment():
     def states(self):
         states = []
         for (lon, lat) in self.points:
-            states.append(State(lon, lat))
+            if (lon, lat) not in self.visited_points:
+                states.append(State(lon, lat))
         return states
 
     def transit_func(self, state, action):
@@ -101,12 +102,14 @@ class Environment():
 
     def reward_func(self, current_state, next_state):
         reward = self.default_reward
+        if len(self.actions) == 1:
+            reward += 100
 
         _lon = current_state.lon - next_state.lon
         _lat = current_state.lat - next_state.lat
 
         if _lon == 0.0 and _lat == 0.0:
-            reward -= 1000
+            reward -= 1
             #raise Exception('Agent has to move somewhere, but Agent is stopped.')
         else:
             reward += 1.0 / np.sqrt(_lon*_lon + _lat*_lat)
@@ -143,8 +146,6 @@ class Environment():
             probs.append(transition_probs[s])
 
         next_state = np.random.choice(next_states, p=probs)
-
-        #next_state = self._move(state, action)
 
         if state != next_state:
             reward = self.reward_func(state, next_state)

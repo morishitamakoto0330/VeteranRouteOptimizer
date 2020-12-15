@@ -1,5 +1,6 @@
 import csv
-from environment import Environment
+import numpy as np
+from environment import Environment, State
 from planner import ValueIterationPlanner
 from matplotlib import pyplot as plt
 
@@ -13,52 +14,36 @@ def main():
     print('sample route ==========================')
     print('{0} points'.format(len(points)))
     print('longitude, latitude')
-    lon_max = 0.0
-    lon_min = 1000.0
-    lat_max = 0.0
-    lat_min = 1000.0
-
     for p in points:
-        if p[0] > lon_max:
-            lon_max = p[0]
-        if p[0] < lon_min:
-            lon_min = p[0]
-        if p[1] > lat_max:
-            lat_max = p[1]
-        if p[1] < lat_min:
-            lat_min = p[1]
         print('({0}, {1})'.format(p[0], p[1]))
 
-    print('normalization =========================')
-    x = []
-    y = []
-    for p in points:
-        lon = p[0]/lon_max
-        lat = p[1]/lat_max
-        print('({0}, {1})'.format(lon, lat))
-        x.append(lat)
-        y.append(lon)
-
-    # value base plan
+    # prepare environment 
     env = Environment(points)
-    planner = ValueIterationPlanner(env)
-    result = planner.plan()
 
-    # print result
-    print(result)
     order = []
-    for r in result:
-        _order = len(result)
-        for _r in result:
-            if r > _r:
-                _order -= 1
-        order.append(_order)
-    print(order)
+    for i in range(len(points) - 1):
+        # value base plan
+        planner = ValueIterationPlanner(env)
+        result = planner.plan()
+        print('{0}:'.format(i))
+        print(result)
+
+        # move next point
+        next_point = points[result.index(max(result))]
+        env.agent_state = State(next_point[0], next_point[1])
+        env.visited_points.append(next_point)
+
+        # save visit order
+        order.append(next_point)
 
     # plot result
-    for i in range(len(result)):
-        plt.scatter(x[i], y[i], label=str(order[i]))
-    plt.legend(loc='upper left')
+    x = []
+    y = []
+    for _x, _y in order:
+        x.append(_x)
+        y.append(_y)
+    plt.scatter(x, y, c='red')
+    plt.plot(x, y, c='red')
     plt.show()
 
 
