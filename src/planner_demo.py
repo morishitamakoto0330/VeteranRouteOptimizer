@@ -18,7 +18,8 @@ def main():
         print('({0}, {1})'.format(p[0], p[1]))
 
     # prepare environment 
-    env = Environment(points)
+    #env = Environment(points)
+    env = Environment(points, move_prob=1.0)
 
     order = []
     for i in range(len(points) - 1):

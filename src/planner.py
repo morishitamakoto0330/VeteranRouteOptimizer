@@ -7,7 +7,8 @@ class Planner():
     def initialize(self):
         self.log = []
 
-    def plan(self, gamma=0.9, threshold=0.0001):
+    #def plan(self, gamma=0.9, threshold=0.0001):
+    def plan(self, gamma=1.0, threshold=0.0001):
         raise Exception('Planner have to implements plan method.')
 
     def transitions_at(self, state, action):
