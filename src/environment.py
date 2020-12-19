@@ -3,48 +3,57 @@ import numpy as np
 
 class State():
 
-    def __init__(self, lon=-1, lat=-1):
-        self.lon = lon
+    def __init__(self, visited_points=[], lat=-1, lng=-1):
         self.lat = lat
+        self.lng = lng
+        self.visited_points = visited_points
+        self.visited_points.append((lat, lng))
 
     def __repr__(self):
-        return '<State: [{0}, {1}]>'.format(self.lon, self.lat)
+        return '<State: current_point=[{0}, {1}], visited_points_num={2}>'.format(self.lat, self.lng, len(self.visited_points))
 
     def clone(self):
-        return State(self.lon, self.lat)
+        return State(self.lat, self.lng)
 
     def __hash__(self):
-        return hash((self.lon, self.lat))
+        return hash((self.lat, self.lng))
 
     def __eq__(self, other):
-        return self.lon == other.lon and self.lat == other.lat
+        if self.lat != other.lat or self.lng != other.lng:
+            return False
+        if len(self.visited_points) != len(other.visited_points):
+            return False
+        else:
+            for i in range(len(self.visited_points)):
+                self_point = self.visited_points[i]
+                other_point = other.visited_points[i]
+                if self_point != other_point:
+                    return False
+        return True
 
-
-class Action():
-    pass
 
 
 class Environment():
 
     def __init__(self, points, move_prob=0.8):
         self.points = points
-        self.visited_points = []
         self.agent_state = State()
         self.default_reward = -0.04
         self.move_prob = move_prob
+        self.start_point = (-1, -1)
         self.reset()
 
     @property
-    def lon_length(self):
+    def lat_length(self):
         return len(self.points[0])
 
     @property
-    def lat_length(self):
+    def lng_length(self):
         return len(self.points[1])
 
     @property
     def actions(self):
-        visited = self.visited_points
+        visited = self.agent_state.visited_points
         not_visited = []
 
         for p in self.points:
@@ -60,9 +69,9 @@ class Environment():
     @property
     def states(self):
         states = []
-        for (lon, lat) in self.points:
-            if (lon, lat) not in self.visited_points:
-                states.append(State(lon, lat))
+        for (lat, lng) in self.points:
+            if (lat, lng) not in self.agent_state.visited_points:
+                states.append(State(self.agent_state.visited_points[:], lat, lng))
         return states
 
     def transit_func(self, state, action):
@@ -90,40 +99,40 @@ class Environment():
 
     def can_action_at(self, state):
         # Agent visited all point or not
-        return len(self.visited_points) < len(self.points)
+        return len(state.visited_points) < len(self.points)
 
     def _move(self, state, action):
         if not self.can_action_at(state):
             return None
 
-        next_state = State(action[0], action[1])
+        next_state = State(state.visited_points[:], action[0], action[1])
 
         return next_state
 
     def reward_func(self, current_state, next_state):
         reward = self.default_reward
-        if len(self.actions) == 1:
-            reward += 100
-
-        _lon = current_state.lon - next_state.lon
         _lat = current_state.lat - next_state.lat
+        _lng = current_state.lng - next_state.lng
 
-        if _lon == 0.0 and _lat == 0.0:
+        if _lat == 0.0 and _lng == 0.0:
             reward -= 1
             #raise Exception('Agent has to move somewhere, but Agent is stopped.')
         else:
-            reward += 1.0 / np.sqrt(_lon*_lon + _lat*_lat)
+            reward += 1.0 / np.sqrt(_lat*_lat + _lng*_lng)
+
+        if len(self.actions) == 1:
+            _lat = next_state.lat - self.start_point[0]
+            _lng = next_state.lng - self.start_point[1]
+            reward += 1.0 / np.sqrt(_lat*_lat + _lng*_lng)
 
         return reward
 
     def reset(self):
         # start point
         point = self.points[0]
+        self.start_point = point
         # set initial value
-        self.visited_points = []
-        self.visited_points.append(point)
-        self.agent_state.lon = point[0]
-        self.agent_state.lat = point[1]
+        self.agent_state = State([], point[0], point[1])
 
         return self.agent_state
 
@@ -149,7 +158,8 @@ class Environment():
 
         if state != next_state:
             reward = self.reward_func(state, next_state)
-            self.visited_points.append((next_state.lon, next_state.lat))
+            # ato de yaru
+            #self.visited_points.append((next_state.lon, next_state.lat))
 
             return next_state, reward
 

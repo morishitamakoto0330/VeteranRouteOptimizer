@@ -7,8 +7,7 @@ class Planner():
     def initialize(self):
         self.log = []
 
-    #def plan(self, gamma=0.9, threshold=0.0001):
-    def plan(self, gamma=1.0, threshold=0.0001):
+    def plan(self, gamma=0.9, threshold=0.0001):
         raise Exception('Planner have to implements plan method.')
 
     def transitions_at(self, state, action):
@@ -26,7 +25,7 @@ class Planner():
 
         for s in state_reward_dict:
             for index, p in enumerate(self.env.points):
-                if p[0] == s.lon and p[1] == s.lat:
+                if p[0] == s.lat and p[1] == s.lng:
                     points[index] = state_reward_dict[s]
 
         return points
@@ -42,6 +41,8 @@ class ValueIterationPlanner(Planner):
         V = {}
         for s in self.env.states:
             V[s] = 0
+
+            print(s)
 
         while True:
             delta = 0

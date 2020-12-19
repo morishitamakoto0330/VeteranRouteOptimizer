@@ -18,11 +18,11 @@ def main():
         print('({0}, {1})'.format(p[0], p[1]))
 
     # prepare environment 
-    #env = Environment(points)
     env = Environment(points, move_prob=1.0)
 
     order = []
-    for i in range(len(points) - 1):
+    i = 1
+    while(env.can_action_at(env.agent_state)):
         # value base plan
         planner = ValueIterationPlanner(env)
         result = planner.plan()
@@ -31,11 +31,13 @@ def main():
 
         # move next point
         next_point = points[result.index(max(result))]
-        env.agent_state = State(next_point[0], next_point[1])
-        env.visited_points.append(next_point)
+        env.agent_state = State(env.agent_state.visited_points, next_point[0], next_point[1])
 
         # save visit order
         order.append(next_point)
+
+        # counter
+        i += 1
 
     # plot result
     x = []
