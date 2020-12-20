@@ -13,10 +13,11 @@ class State():
         return '<State: current_point=[{0}, {1}], visited_points_num={2}>'.format(self.lat, self.lng, len(self.visited_points))
 
     def clone(self):
-        return State(self.lat, self.lng)
+        return State(self.visited_point[:-1], self.lat, self.lng)
 
     def __hash__(self):
-        return hash((self.lat, self.lng))
+        #return hash((self.lat, self.lng))
+        return hash(tuple(self.visited_points))
 
     def __eq__(self, other):
         if self.lat != other.lat or self.lng != other.lng:
@@ -51,27 +52,19 @@ class Environment():
     def lng_length(self):
         return len(self.points[1])
 
-    @property
-    def actions(self):
-        visited = self.agent_state.visited_points
+    def actions(self, state):
         not_visited = []
-
         for p in self.points:
-            isVisited = False
-            for v in visited:
-                if p[0] == v[0] and p[1] == v[1]:
-                    isVisited = True
-            if not isVisited:
+            if p not in state.visited_points:
                 not_visited.append(p)
 
         return not_visited
 
-    @property
-    def states(self):
+    def states(self, state):
         states = []
         for (lat, lng) in self.points:
-            if (lat, lng) not in self.agent_state.visited_points:
-                states.append(State(self.agent_state.visited_points[:], lat, lng))
+            if (lat, lng) not in state.visited_points:
+                states.append(State(state.visited_points[:], lat, lng))
         return states
 
     def transit_func(self, state, action):
@@ -80,17 +73,17 @@ class Environment():
         if not self.can_action_at(state):
             return transition_probs
 
-        if len(self.actions) == 1:
-            next_state = self._move(state, self.actions[0])
+        if len(self.actions(state)) == 1:
+            next_state = self._move(state, self.actions(state)[0])
             transition_probs[next_state] = 1.0
             return transition_probs
 
-        for a in self.actions:
+        for a in self.actions(state):
             prob = 0.0
             if a == action:
                 prob = self.move_prob
             else:
-                prob = (1.0 - self.move_prob)/(len(self.actions) - 1)
+                prob = (1.0 - self.move_prob)/(len(self.actions(state)) - 1)
 
             next_state = self._move(state, a)
             transition_probs[next_state] = prob
@@ -120,7 +113,7 @@ class Environment():
         else:
             reward += 1.0 / np.sqrt(_lat*_lat + _lng*_lng)
 
-        if len(self.actions) == 1:
+        if len(self.actions(current_state)) == 1:
             _lat = next_state.lat - self.start_point[0]
             _lng = next_state.lng - self.start_point[1]
             reward += 1.0 / np.sqrt(_lat*_lat + _lng*_lng)

@@ -6,9 +6,16 @@ from matplotlib import pyplot as plt
 
 def main():
     # read file
-    with open('sample_route.csv') as f:
+    #with open('sample_route.csv') as f:
+    with open('sample_route_mini.csv') as f:
         reader = csv.reader(f)
-        points = [(float(row[0]), float(row[1])) for row in reader if len(row) != 0]
+
+        points = []
+        for row in reader:
+            if len(row) != 0 and row[0] != '' and row[1] != '':
+                lat = float(row[0].replace('"', ''))
+                lng = float(row[1].replace('"', ''))
+                points.append((lat, lng))
 
     # print route
     print('sample route ==========================')
@@ -17,38 +24,41 @@ def main():
     for p in points:
         print('({0}, {1})'.format(p[0], p[1]))
 
-    # prepare environment 
     env = Environment(points, move_prob=1.0)
+    planner = ValueIterationPlanner(env)
+    result = planner.plan()
 
-    order = []
-    i = 1
-    while(env.can_action_at(env.agent_state)):
-        # value base plan
-        planner = ValueIterationPlanner(env)
-        result = planner.plan()
-        print('{0}:'.format(i))
-        print(result)
+    print(result)
 
-        # move next point
-        next_point = points[result.index(max(result))]
-        env.agent_state = State(env.agent_state.visited_points, next_point[0], next_point[1])
-
-        # save visit order
-        order.append(next_point)
-
-        # counter
-        i += 1
-
-    # plot result
-    x = []
-    y = []
-    for _x, _y in order:
-        x.append(_x)
-        y.append(_y)
-    plt.scatter(x, y, c='red')
-    plt.plot(x, y, c='red')
-    plt.show()
-
+#    order = []
+#    i = 1
+#    while(env.can_action_at(env.agent_state)):
+#        # value base plan
+#        planner = ValueIterationPlanner(env)
+#        result = planner.plan()
+#        print('{0}:'.format(i))
+#        print(result)
+#
+#        # move next point
+#        next_point = points[result.index(max(result))]
+#        env.agent_state = State(env.agent_state.visited_points, next_point[0], next_point[1])
+#
+#        # save visit order
+#        order.append(next_point)
+#
+#        # counter
+#        i += 1
+#
+#    # plot result
+#    x = []
+#    y = []
+#    for _x, _y in order:
+#        x.append(_x)
+#        y.append(_y)
+#    plt.scatter(x, y, c='red')
+#    plt.plot(x, y, c='red')
+#    plt.show()
+#
 
 if __name__=="__main__":
     main()

@@ -25,7 +25,7 @@ class Planner():
 
         for s in state_reward_dict:
             for index, p in enumerate(self.env.points):
-                if p[0] == s.lat and p[1] == s.lng:
+                if p[0] == s.lat and p[1] == s.lng and state_reward_dict[s] != 0:
                     points[index] = state_reward_dict[s]
 
         return points
@@ -35,14 +35,26 @@ class ValueIterationPlanner(Planner):
     def __init__(self, env):
         super().__init__(env)
 
+    def enum_state(self, env):
+        V = {}
+        states = []
+
+        state = env.agent_state
+        states.append(state)
+        while states:
+            state = states.pop()
+            for s in env.states(state):
+                V[s] = 0
+                states.append(s)
+
+        return V
+
+
     def plan(self, gamma=0.9, threshold=0.0001):
         self.initialize()
-        actions = self.env.actions
-        V = {}
-        for s in self.env.states:
-            V[s] = 0
 
-            print(s)
+        V = self.enum_state(self.env)
+        print('number of states={0}'.format(len(V)))
 
         while True:
             delta = 0
@@ -51,11 +63,13 @@ class ValueIterationPlanner(Planner):
                 if not self.env.can_action_at(s):
                     continue
                 expected_rewards = []
-                for a in actions:
+
+                for a in self.env.actions(s):
                     r = 0
                     for prob, next_state, reward in self.transitions_at(s, a):
                         r += prob * (reward + gamma * V[next_state])
                     expected_rewards.append(r)
+
                 max_reward = max(expected_rewards)
                 delta = max(delta, abs(max_reward - V[s]))
                 V[s] = max_reward
