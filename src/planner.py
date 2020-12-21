@@ -18,17 +18,21 @@ class Planner():
             yield prob, next_state, reward
 
     def dict_to_points(self, state_reward_dict):
-        points = []
-        for i in range(len(self.env.points)):
-            p = 0
-            points.append(p)
-
+        state = None
         for s in state_reward_dict:
-            for index, p in enumerate(self.env.points):
-                if p[0] == s.lat and p[1] == s.lng and state_reward_dict[s] != 0:
-                    points[index] = state_reward_dict[s]
+            if (len(self.env.points) - 1) == len(s.visited_points):
+                if state is None:
+                    state = s
+                else:
+                    if state_reward_dict[state] < state_reward_dict[s]:
+                        state = s
 
-        return points
+        if state is None:
+            return []
+        else:
+            return state.visited_points
+
+
 
 class ValueIterationPlanner(Planner):
     
@@ -39,8 +43,11 @@ class ValueIterationPlanner(Planner):
         V = {}
         states = []
 
+        # start state
         state = env.agent_state
+        V[state] = 0
         states.append(state)
+
         while states:
             state = states.pop()
             for s in env.states(state):
@@ -51,10 +58,11 @@ class ValueIterationPlanner(Planner):
 
 
     def plan(self, gamma=0.9, threshold=0.0001):
+        print('gamma={0}, threshold={1}'.format(gamma, threshold))
         self.initialize()
 
         V = self.enum_state(self.env)
-        print('number of states={0}'.format(len(V)))
+        print('number of all states={0}'.format(len(V)))
 
         while True:
             delta = 0

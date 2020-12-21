@@ -39,7 +39,7 @@ class Environment():
     def __init__(self, points, move_prob=0.8):
         self.points = points
         self.agent_state = State()
-        self.default_reward = -0.04
+        self.default_reward = 0.0
         self.move_prob = move_prob
         self.start_point = (-1, -1)
         self.reset()
@@ -83,7 +83,8 @@ class Environment():
             if a == action:
                 prob = self.move_prob
             else:
-                prob = (1.0 - self.move_prob)/(len(self.actions(state)) - 1)
+                #prob = (1.0 - self.move_prob)/(len(self.actions(state)) - 1)
+                prob = 0.0
 
             next_state = self._move(state, a)
             transition_probs[next_state] = prob
@@ -108,8 +109,7 @@ class Environment():
         _lng = current_state.lng - next_state.lng
 
         if _lat == 0.0 and _lng == 0.0:
-            reward -= 1
-            #raise Exception('Agent has to move somewhere, but Agent is stopped.')
+            raise Exception('Agent has to move somewhere, but Agent is stopped.')
         else:
             reward += 1.0 / np.sqrt(_lat*_lat + _lng*_lng)
 
@@ -126,8 +126,6 @@ class Environment():
         self.start_point = point
         # set initial value
         self.agent_state = State([], point[0], point[1])
-
-        return self.agent_state
 
     def step(self, action):
         next_state, reward = self.transit(self.agent_state, action)
