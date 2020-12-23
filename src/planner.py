@@ -1,3 +1,5 @@
+from environment import State
+
 class Planner():
 
     def __init__(self, env):
@@ -19,6 +21,7 @@ class Planner():
 
     def dict_to_points(self, state_reward_dict):
         state = None
+        # search max Value state
         for s in state_reward_dict:
             if (len(self.env.points) - 1) == len(s.visited_points):
                 if state is None:
@@ -30,7 +33,8 @@ class Planner():
         if state is None:
             return []
         else:
-            return state.visited_points
+            last_point = list(set(self.env.points) - set(state.visited_points))
+            return state.visited_points + last_point
 
 
 
@@ -43,7 +47,7 @@ class ValueIterationPlanner(Planner):
         V = {}
         states = []
 
-        # start state
+        # initail state
         state = env.agent_state
         V[state] = 0
         states.append(state)

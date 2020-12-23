@@ -43,8 +43,8 @@ def main():
     for _x, _y in result:
         x.append(_x)
         y.append(_y)
-    #x.append(x[0])
-    #y.append(y[0])
+    x.append(x[0])
+    y.append(y[0])
 
     plt.plot(x, y, c='red')
     plt.show()
