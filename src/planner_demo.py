@@ -6,8 +6,7 @@ from matplotlib import pyplot as plt
 
 def main():
     # read file
-    #with open('sample_route.csv') as f:
-    with open('sample_route_mini.csv') as f:
+    with open('../res/data/sample_route_mini.csv') as f:
         reader = csv.reader(f)
 
         points = []
