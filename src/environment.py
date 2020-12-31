@@ -16,7 +16,6 @@ class State():
         return State(self.visited_point[:-1], self.lat, self.lng)
 
     def __hash__(self):
-        #return hash((self.lat, self.lng))
         return hash(tuple(self.visited_points))
 
     def __eq__(self, other):
