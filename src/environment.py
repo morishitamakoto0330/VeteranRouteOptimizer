@@ -31,6 +31,24 @@ class State():
                     return False
         return True
 
+class Action():
+
+    def __init__(self, lat=-1, lng=-1):
+        self.lat = lat
+        self.lng = lng
+
+    def __hash__(self):
+        return hash((self.lat, self.lng))
+
+class Util():
+
+    @staticmethod
+    def point2index(point, points):
+        for index, p in enumerate(points):
+            if p==point:
+                return index
+        return -1
+
 
 
 class Environment():
