@@ -2,7 +2,7 @@ import math
 import csv
 from collections import defaultdict
 from el_agent import ELAgent
-from environment import Environment, Util
+from environment import Environment, Util, State
 
 def getPoints():
     # read file
@@ -66,8 +66,23 @@ class MonteCarloAgent(ELAgent):
 def train():
     agent = MonteCarloAgent(epsilon=0.1)
     env = Environment(getPoints(), move_prob=1.0)
-    agent.learn(env, episode_count=500, gamma=1.0)
-    #agent.show_reward_log()
+    agent.learn(env, episode_count=500, gamma=1.0, report_interval=50)
+    agent.show_reward_log()
+
+    ok = 0
+    ng = 0
+    for s in agent.Q:
+        count = 0
+        for q in agent.Q[s]:
+            if q != 0:
+                count += 1
+
+        if count != 1:
+            ok += 1
+        else:
+            ng += 1
+
+    print('{0}: {1} vs. {2}'.format(len(agent.Q), ok, ng))
 
 
 if __name__ == "__main__":
