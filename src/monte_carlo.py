@@ -2,7 +2,7 @@ import math
 import csv
 from collections import defaultdict
 from el_agent import ELAgent
-from environment import Environment, Util, State
+from environment import Environment, Util, State, RewardCalcMethod
 
 
 class MonteCarloAgent(ELAgent):
@@ -37,7 +37,7 @@ class MonteCarloAgent(ELAgent):
                 a = Util.point2index(x["action"], env.points)
 
                 # Calculate discounted future reward of s.
-                G, t = Util.calc_reward(s), 0
+                G, t = Util.calc_reward_prev(env, s), 0
                 for j in range(i, len(experience)):
                     G += math.pow(gamma, t) * experience[j]["reward"]
                     t += 1
@@ -54,15 +54,17 @@ def train():
     # prepare
     agent = MonteCarloAgent(epsilon=0.1)
     points = Util.get_points()
-    d_matrix, t_matrix = Util.get_matrix()
-    env = Environment(points, move_prob=1.0)
+    distance_matrix, time_matrix = Util.get_matrix()
+    env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.STRAIGHT, move_prob=1.0)
+    #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.DISTANCE, move_prob=1.0)
+    #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.TIME, move_prob=1.0)
 
     # learn
     agent.learn(env, episode_count=500, gamma=1.0, report_interval=50)
     agent.show_reward_log()
 
     # result
-    best_state = Util.extract_best_state(agent.Q)
+    best_state = Util.extract_best_state(env, agent.Q)
     Util.show_route(points, best_state.visited_points)
 
 

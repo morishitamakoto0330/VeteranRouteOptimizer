@@ -1,6 +1,7 @@
 import numpy as np
 import csv
 from matplotlib import pyplot as plt
+from enum import Enum
 
 
 class State():
@@ -33,6 +34,11 @@ class State():
                     return False
         return True
 
+class RewardCalcMethod(Enum):
+    STRAIGHT = 1
+    DISTANCE = 2
+    TIME = 3
+
 class Util():
 
     @staticmethod
@@ -64,7 +70,7 @@ class Util():
                 _distance_matrix = []
                 for d in row:
                     _distance_matrix.append(float(d))
-                    str += '{0} '.format(float(d))
+                    str += '{0:>10}'.format(float(d))
                 distance_matrix.append(_distance_matrix)
                 str += '\n'
             print(str)
@@ -77,7 +83,7 @@ class Util():
                 _time_matrix = []
                 for d in row:
                     _time_matrix.append(float(d))
-                    str += '{0} '.format(float(d))
+                    str += '{0:>10} '.format(float(d))
                 time_matrix.append(_time_matrix)
                 str += '\n'
             print(str)
@@ -92,22 +98,64 @@ class Util():
         return -1
 
     @staticmethod
-    def calc_reward(state):
+    def calc_reward(env, current_state, next_state):
         reward = 0.0
-        points = state.visited_points
-        for i in range(len(points) - 1):
-            lat = points[i][0] - points[i+1][0]
-            lng = points[i][1] - points[i+1][1]
+
+        current_p = (current_state.lat, current_state.lng)
+        current_index = Util.point2index(current_p, env.points)
+        next_p = (next_state.lat, next_state.lng)
+        next_index = Util.point2index(next_p, env.points)
+
+        if env.method == RewardCalcMethod.STRAIGHT:
+            lat = current_state.lat - next_state.lat
+            lng = current_state.lng - next_state.lng
             reward += 1.0 / np.sqrt(lat*lat + lng*lng)
+        elif env.method == RewardCalcMethod.DISTANCE:
+            reward += env.distance_matrix[current_index][next_index]
+        elif env.method == RewardCalcMethod.TIME:
+            reward += env.time_matrix[current_index][next_index]
+        else:
+            raise Exception('You specified invalid RewardCalcMethod.')
+
         return reward
 
     @staticmethod
-    def extract_best_state(Q):
+    def calc_reward_prev(env, state):
+        reward = 0.0
+        points = state.visited_points
+
+        if env.method == RewardCalcMethod.STRAIGHT:
+            for i in range(len(points) - 1):
+                lat = points[i][0] - points[i+1][0]
+                lng = points[i][1] - points[i+1][1]
+                reward += 1.0 / np.sqrt(lat*lat + lng*lng)
+        elif env.method == RewardCalcMethod.DISTANCE:
+            for i in range(len(points) - 1):
+                current_index = Util.point2index(points[i], env.points)
+                next_index = Util.point2index(points[i+1], env.points)
+                reward += env.distance_matrix[current_index][next_index]
+        elif env.method == RewardCalcMethod.TIME:
+            for i in range(len(points) - 1):
+                current_index = Util.point2index(points[i], env.points)
+                next_index = Util.point2index(points[i+1], env.points)
+                reward += env.time_matrix[current_index][next_index]
+        else:
+            raise Exception('You specified invalid RewardCalcMethod.')
+
+        #for i in range(len(points) - 1):
+        #    lat = points[i][0] - points[i+1][0]
+        #    lng = points[i][1] - points[i+1][1]
+        #    reward += 1.0 / np.sqrt(lat*lat + lng*lng)
+
+        return reward
+
+    @staticmethod
+    def extract_best_state(env, Q):
         only_one_action = 0
         best_state = State()
         best_q = 0.0
         for s in Q:
-            q = Util.calc_reward(s)
+            q = Util.calc_reward_prev(env, s)
             if best_q < q:
                 best_q = q
                 best_state = s
@@ -156,8 +204,11 @@ class Util():
 
 class Environment():
 
-    def __init__(self, points, move_prob=1.0):
+    def __init__(self, points, distance_matrix, time_matrix, method=RewardCalcMethod.STRAIGHT, move_prob=1.0):
         self.points = points
+        self.distance_matrix = distance_matrix
+        self.time_matrix = time_matrix
+        self.method = method
         self.agent_state = State()
         self.default_reward = 0.0
         self.move_prob = move_prob
@@ -224,19 +275,21 @@ class Environment():
         return next_state
 
     def reward_func(self, current_state, next_state):
-        reward = self.default_reward
-        _lat = current_state.lat - next_state.lat
-        _lng = current_state.lng - next_state.lng
-
-        if _lat == 0.0 and _lng == 0.0:
-            raise Exception('Agent has to move somewhere, but Agent is stopped.')
-        else:
-            reward += 1.0 / np.sqrt(_lat*_lat + _lng*_lng)
+        reward = Util.calc_reward(self, current_state, next_state)
 
         if len(self.actions(current_state)) == 1:
-            _lat = next_state.lat - self.start_point[0]
-            _lng = next_state.lng - self.start_point[1]
-            reward += 1.0 / np.sqrt(_lat*_lat + _lng*_lng)
+            next_index = Util.point2index((next_state.lat, next_state.lng), self.points)
+
+            if self.method == RewardCalcMethod.STRAIGHT:
+                lat = next_state.lat - self.start_point[0]
+                lng = next_state.lng - self.start_point[1]
+                reward += 1.0 / np.sqrt(lat*lat + lng*lng)
+            elif self.method == RewardCalcMethod.DISTANCE:
+                reward += self.distance_matrix[next_index][0]
+            elif self.method == RewardCalcMethod.TIME:
+                reward += self.time_matrix[next_index][0]
+            else:
+                raise Exception('You specified invalid RewardCalcMethod.')
 
         return reward
 
