@@ -4,19 +4,6 @@ from collections import defaultdict
 from el_agent import ELAgent
 from environment import Environment, Util, State
 
-def getPoints():
-    # read file
-    points = []
-    print("sample route on 2020/6/13 =================================")
-    with open('../res/data/20200613_512848.csv') as f:
-        reader = csv.reader(f)
-        for index, row in enumerate(reader):
-            if index != 0:
-                lat = float(row[6])
-                lng = float(row[7])
-                points.append((lat, lng))
-                print("{0}: ({1},{2})".format(index, lat, lng))
-    return points
 
 class MonteCarloAgent(ELAgent):
 
@@ -50,7 +37,7 @@ class MonteCarloAgent(ELAgent):
                 a = Util.point2index(x["action"], env.points)
 
                 # Calculate discounted future reward of s.
-                G, t = 0, 0
+                G, t = Util.calc_reward(s), 0
                 for j in range(i, len(experience)):
                     G += math.pow(gamma, t) * experience[j]["reward"]
                     t += 1
@@ -64,26 +51,23 @@ class MonteCarloAgent(ELAgent):
 
 
 def train():
+    # prepare
     agent = MonteCarloAgent(epsilon=0.1)
-    env = Environment(getPoints(), move_prob=1.0)
+    points = Util.get_points()
+    d_matrix, t_matrix = Util.get_matrix()
+    env = Environment(points, move_prob=1.0)
+
+    # learn
     agent.learn(env, episode_count=500, gamma=1.0, report_interval=50)
     agent.show_reward_log()
 
-    ok = 0
-    ng = 0
-    for s in agent.Q:
-        count = 0
-        for q in agent.Q[s]:
-            if q != 0:
-                count += 1
-
-        if count != 1:
-            ok += 1
-        else:
-            ng += 1
-
-    print('{0}: {1} vs. {2}'.format(len(agent.Q), ok, ng))
+    # result
+    best_state = Util.extract_best_state(agent.Q)
+    Util.show_route(points, best_state.visited_points)
 
 
 if __name__ == "__main__":
     train()
+
+
+
