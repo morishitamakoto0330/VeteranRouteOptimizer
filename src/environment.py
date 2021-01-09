@@ -142,11 +142,6 @@ class Util():
         else:
             raise Exception('You specified invalid RewardCalcMethod.')
 
-        #for i in range(len(points) - 1):
-        #    lat = points[i][0] - points[i+1][0]
-        #    lng = points[i][1] - points[i+1][1]
-        #    reward += 1.0 / np.sqrt(lat*lat + lng*lng)
-
         return reward
 
     @staticmethod
@@ -198,8 +193,24 @@ class Util():
         x.append(points[0][0])
         y.append(points[0][1])
 
+        # output route to file
+        #with open('../res/data/20200613/512848/monte_carlo_straight.csv', mode='a') as f:
+        #with open('../res/data/20200613/512848/monte_carlo_distance.csv', mode='a') as f:
+        #with open('../res/data/20200613/512848/monte_carlo_time.csv', mode='a') as f:
+        with open('../res/data/20200613/512848/q_learning_straight.csv', mode='a') as f:
+        #with open('../res/data/20200613/512848/q_learning_distance.csv', mode='a') as f:
+        #with open('../res/data/20200613/512848/q_learning_time.csv', mode='a') as f:
+            str = ''
+            for i in range(len(x)):
+                index = Util.point2index((x[i], y[i]), points)
+                str += '{0},'.format(index)
+            str += '\n'
+            f.write(str)
+
+        # plot route
         plt.plot(x, y, c='red')
         plt.show()
+
 
 
 class Environment():
