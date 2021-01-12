@@ -1,5 +1,6 @@
 import numpy as np
 import csv
+import math
 from matplotlib import pyplot as plt
 from enum import Enum
 
@@ -160,7 +161,7 @@ class Util():
                     count += 1
             if count == 1:
                 only_one_action += 1
-        print('Number of State = {0}'.format(len(Q)))
+        print('Number of State = {0}({1}%)'.format(len(Q), len(Q) / math.factorial(len(env.points) - 1) * 100))
         print('Number of State (only one action) = {0}'.format(only_one_action))
         print('Best State: {0}'.format(best_state))
         print('Best Q: {0}'.format(best_q))
@@ -194,10 +195,10 @@ class Util():
         y.append(points[0][1])
 
         # output route to file
-        #with open('../res/data/20200613/512848/monte_carlo_straight.csv', mode='a') as f:
+        with open('../res/data/20200613/512848/monte_carlo_straight.csv', mode='a') as f:
         #with open('../res/data/20200613/512848/monte_carlo_distance.csv', mode='a') as f:
         #with open('../res/data/20200613/512848/monte_carlo_time.csv', mode='a') as f:
-        with open('../res/data/20200613/512848/q_learning_straight.csv', mode='a') as f:
+        #with open('../res/data/20200613/512848/q_learning_straight.csv', mode='a') as f:
         #with open('../res/data/20200613/512848/q_learning_distance.csv', mode='a') as f:
         #with open('../res/data/20200613/512848/q_learning_time.csv', mode='a') as f:
             str = ''

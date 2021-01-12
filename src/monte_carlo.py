@@ -55,9 +55,9 @@ def train():
     agent = MonteCarloAgent(epsilon=0.1)
     points = Util.get_points()
     distance_matrix, time_matrix = Util.get_matrix()
-    #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.STRAIGHT, move_prob=1.0)
+    env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.STRAIGHT, move_prob=1.0)
     #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.DISTANCE, move_prob=1.0)
-    env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.TIME, move_prob=1.0)
+    #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.TIME, move_prob=1.0)
 
     # learn
     agent.learn(env, episode_count=500, gamma=1.0, report_interval=50)
