@@ -210,7 +210,7 @@ class Util():
 
         # plot route
         plt.plot(x, y, c='red')
-        plt.show()
+        #plt.show()
 
 
 

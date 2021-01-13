@@ -1,5 +1,4 @@
-import math
-import csv
+import math, csv, time
 from collections import defaultdict
 from el_agent import ELAgent
 from environment import Environment, Util, State, RewardCalcMethod
@@ -52,18 +51,29 @@ class MonteCarloAgent(ELAgent):
 
 def train():
     # prepare
-    agent = MonteCarloAgent(epsilon=0.1)
+    #agent = MonteCarloAgent(epsilon=0.1)
+    #agent = MonteCarloAgent(epsilon=0.3)
+    agent = MonteCarloAgent(epsilon=0.5)
     points = Util.get_points()
     distance_matrix, time_matrix = Util.get_matrix()
     env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.STRAIGHT, move_prob=1.0)
     #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.DISTANCE, move_prob=1.0)
     #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.TIME, move_prob=1.0)
 
+    time_sta = time.perf_counter()
     # learn
-    agent.learn(env, episode_count=500, gamma=1.0, report_interval=50)
-    agent.show_reward_log()
+    #agent.learn(env, episode_count=500, gamma=1.0, report_interval=50)
+    #agent.learn(env, episode_count=5000, gamma=1.0, report_interval=50)
+    agent.learn(env, episode_count=50000, gamma=1.0, report_interval=50)
+    time_end = time.perf_counter()
 
-    # result
+    # output execution time
+    print('learn time={0} [s]'.format(time_end - time_sta))
+    with open('../res/data/20200613/512848/time_monte_carlo_straight.csv', mode='a') as f:
+        f.write('{0}\n'.format(time_end - time_sta))
+
+    # show result
+    #agent.show_reward_log()
     best_state = Util.extract_best_state(env, agent.Q)
     Util.show_route(points, best_state.visited_points)
 
