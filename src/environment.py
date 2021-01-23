@@ -43,10 +43,11 @@ class RewardCalcMethod(Enum):
 class Util():
 
     @staticmethod
-    def get_points():
+    def get_points(id):
         points = []
-        print("sample route on 2020/6/13 =================================")
-        with open('../res/data/20200613/512848/20200613_512848.csv') as f:
+        print("sample route of ID={0} on 2020/6/13 =================================".format(id))
+        #with open('../res/data/20200613/512848/20200613_512848.csv') as f:
+        with open('../res/data/20200613/' + id + '/20200613_' + id + '.csv') as f:
             reader = csv.reader(f)
             for index, row in enumerate(reader):
                 if index != 0:
@@ -59,12 +60,13 @@ class Util():
         return points
 
     @staticmethod
-    def get_matrix():
+    def get_matrix(id):
         distance_matrix = []
         time_matrix = []
 
-        print("distance matrix on 2020/6/13 =================================")
-        with open('../res/data/20200613/512848/20200613_512848_distance.csv') as f:
+        print("distance matrix of ID={0} on 2020/6/13 =================================".format(id))
+        #with open('../res/data/20200613/512848/20200613_512848_distance.csv') as f:
+        with open('../res/data/20200613/' + id + '/20200613_' + id + '_distance.csv') as f:
             reader = csv.reader(f)
             str = ''
             for row in reader:
@@ -76,8 +78,8 @@ class Util():
                 str += '\n'
             print(str)
 
-        print("time matrix on 2020/6/13 =================================")
-        with open('../res/data/20200613/512848/20200613_512848_duration.csv') as f:
+        print("time matrix of ID={0} on 2020/6/13 =================================".format(id))
+        with open('../res/data/20200613/' + id + '/20200613_' + id + '_duration.csv') as f:
             reader = csv.reader(f)
             str = ''
             for row in reader:
@@ -169,7 +171,7 @@ class Util():
         return best_state
 
     @staticmethod
-    def show_route(points, visited_points):
+    def show_route(id, points, visited_points):
         x = []
         y = []
         for lat, lng in points:
@@ -195,12 +197,7 @@ class Util():
         y.append(points[0][1])
 
         # output route to file
-        with open('../res/data/20200613/512848/monte_carlo_straight.csv', mode='a') as f:
-        #with open('../res/data/20200613/512848/monte_carlo_distance.csv', mode='a') as f:
-        #with open('../res/data/20200613/512848/monte_carlo_time.csv', mode='a') as f:
-        #with open('../res/data/20200613/512848/q_learning_straight.csv', mode='a') as f:
-        #with open('../res/data/20200613/512848/q_learning_distance.csv', mode='a') as f:
-        #with open('../res/data/20200613/512848/q_learning_time.csv', mode='a') as f:
+        with open('../res/data/20200613/' + id + '/monte_carlo_straight.csv', mode='a') as f:
             str = ''
             for i in range(len(x)):
                 index = Util.point2index((x[i], y[i]), points)

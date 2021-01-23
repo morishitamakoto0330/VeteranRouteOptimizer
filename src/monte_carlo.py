@@ -51,11 +51,22 @@ class MonteCarloAgent(ELAgent):
 
 def train():
     # prepare
+    #id = '316632'
+    id = '512848'
+
     #agent = MonteCarloAgent(epsilon=0.1)
+    #agent = MonteCarloAgent(epsilon=0.2)
     #agent = MonteCarloAgent(epsilon=0.3)
-    agent = MonteCarloAgent(epsilon=0.5)
-    points = Util.get_points()
-    distance_matrix, time_matrix = Util.get_matrix()
+    #agent = MonteCarloAgent(epsilon=0.4)
+    #agent = MonteCarloAgent(epsilon=0.5)
+    #agent = MonteCarloAgent(epsilon=0.6)
+    #agent = MonteCarloAgent(epsilon=0.7)
+    #agent = MonteCarloAgent(epsilon=0.8)
+    agent = MonteCarloAgent(epsilon=0.9)
+
+    points = Util.get_points(id)
+    distance_matrix, time_matrix = Util.get_matrix(id)
+
     env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.STRAIGHT, move_prob=1.0)
     #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.DISTANCE, move_prob=1.0)
     #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.TIME, move_prob=1.0)
@@ -69,13 +80,13 @@ def train():
 
     # output execution time
     print('learn time={0} [s]'.format(time_end - time_sta))
-    with open('../res/data/20200613/512848/time_monte_carlo_straight.csv', mode='a') as f:
+    with open('../res/data/20200613/' + id + '/time_monte_carlo_straight.csv', mode='a') as f:
         f.write('{0}\n'.format(time_end - time_sta))
 
     # show result
     #agent.show_reward_log()
     best_state = Util.extract_best_state(env, agent.Q)
-    Util.show_route(points, best_state.visited_points)
+    Util.show_route(id, points, best_state.visited_points)
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ def show_route_data():
 
     print("sample data on 2020/6/13 =================================")
     with open('../../res/data/20200613/512848/points.csv') as f:
+    #with open('../../res/data/20200613/316632/points.csv') as f:
         reader = csv.reader(f)
         for row in reader:
             lat = float(row[0])
@@ -16,7 +17,8 @@ def show_route_data():
             points.append(point)
 
     print("route data on 2020/6/13 =================================")
-    with open('../../res/data/20200613/512848/episode=50000/epsilon=0.5/monte_carlo_straight.csv') as f:
+    with open('../../res/data/20200613/512848/episode=50000/epsilon=0.4/monte_carlo_straight.csv') as f:
+    #with open('../../res/data/20200613/316632/epsilon=0.5/episode=500/monte_carlo_straight.csv') as f:
         reader = csv.reader(f)
         for row in reader:
             _route = []
