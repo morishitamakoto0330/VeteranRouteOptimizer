@@ -7,7 +7,8 @@ def show_route_data():
     route = []
 
     print("sample data on 2020/6/13 =================================")
-    with open('../../res/data/20200613/512848/points.csv') as f:
+    with open('../../res/data/20200613/214532/points.csv') as f:
+    #with open('../../res/data/20200613/512848/points.csv') as f:
     #with open('../../res/data/20200613/316632/points.csv') as f:
         reader = csv.reader(f)
         for row in reader:
@@ -17,8 +18,10 @@ def show_route_data():
             points.append(point)
 
     print("route data on 2020/6/13 =================================")
-    with open('../../res/data/20200613/512848/episode=50000/epsilon=0.4/monte_carlo_straight.csv') as f:
+    #with open('../../res/data/20200613/512848/episode=50000/epsilon=0.4/monte_carlo_straight.csv') as f:
     #with open('../../res/data/20200613/316632/epsilon=0.5/episode=500/monte_carlo_straight.csv') as f:
+    #with open('../../res/data/20200613/214532/monte_carlo_distance.csv') as f:
+    with open('../../res/data/20200613/214532/monte_carlo_time.csv') as f:
         reader = csv.reader(f)
         for row in reader:
             _route = []

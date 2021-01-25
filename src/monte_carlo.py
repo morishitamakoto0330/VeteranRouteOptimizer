@@ -51,9 +51,9 @@ class MonteCarloAgent(ELAgent):
 
 def train():
     # prepare
-    #id = '214532'
+    id = '214532'
     #id = '222911'
-    id = '316632'
+    #id = '316632'
     #id = '512848'
     #id = '612825'
 
@@ -71,8 +71,8 @@ def train():
     distance_matrix, time_matrix = Util.get_matrix(id)
 
     #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.STRAIGHT, move_prob=1.0)
-    #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.DISTANCE, move_prob=1.0)
-    env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.TIME, move_prob=1.0)
+    env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.DISTANCE, move_prob=1.0)
+    #env = Environment(points, distance_matrix, time_matrix, method=RewardCalcMethod.TIME, move_prob=1.0)
 
     time_sta = time.perf_counter()
     # learn
@@ -82,8 +82,8 @@ def train():
     # output execution time
     print('learn time={0} [s]'.format(time_end - time_sta))
     #with open('../res/data/20200613/' + id + '/time_monte_carlo_straight.csv', mode='a') as f:
-    #with open('../res/data/20200613/' + id + '/time_monte_carlo_distance.csv', mode='a') as f:
-    with open('../res/data/20200613/' + id + '/time_monte_carlo_time.csv', mode='a') as f:
+    with open('../res/data/20200613/' + id + '/time_monte_carlo_distance.csv', mode='a') as f:
+    #with open('../res/data/20200613/' + id + '/time_monte_carlo_time.csv', mode='a') as f:
         f.write('{0}\n'.format(time_end - time_sta))
 
     # show result

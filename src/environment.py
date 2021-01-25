@@ -65,7 +65,6 @@ class Util():
         time_matrix = []
 
         print("distance matrix of ID={0} on 2020/6/13 =================================".format(id))
-        #with open('../res/data/20200613/512848/20200613_512848_distance.csv') as f:
         with open('../res/data/20200613/' + id + '/20200613_' + id + '_distance.csv') as f:
             reader = csv.reader(f)
             str = ''
@@ -114,9 +113,9 @@ class Util():
             lng = current_state.lng - next_state.lng
             reward += 1.0 / np.sqrt(lat*lat + lng*lng)
         elif env.method == RewardCalcMethod.DISTANCE:
-            reward += env.distance_matrix[current_index][next_index]
+            reward += 1.0 / float(env.distance_matrix[current_index][next_index])
         elif env.method == RewardCalcMethod.TIME:
-            reward += env.time_matrix[current_index][next_index]
+            reward += 1.0 / float(env.time_matrix[current_index][next_index])
         else:
             raise Exception('You specified invalid RewardCalcMethod.')
 
@@ -136,12 +135,12 @@ class Util():
             for i in range(len(points) - 1):
                 current_index = Util.point2index(points[i], env.points)
                 next_index = Util.point2index(points[i+1], env.points)
-                reward += env.distance_matrix[current_index][next_index]
+                reward += 1.0 / float(env.distance_matrix[current_index][next_index])
         elif env.method == RewardCalcMethod.TIME:
             for i in range(len(points) - 1):
                 current_index = Util.point2index(points[i], env.points)
                 next_index = Util.point2index(points[i+1], env.points)
-                reward += env.time_matrix[current_index][next_index]
+                reward += 1.0 / float(env.time_matrix[current_index][next_index])
         else:
             raise Exception('You specified invalid RewardCalcMethod.')
 
@@ -198,8 +197,8 @@ class Util():
 
         # output route to file
         #with open('../res/data/20200613/' + id + '/monte_carlo_straight.csv', mode='a') as f:
-        #with open('../res/data/20200613/' + id + '/monte_carlo_distance.csv', mode='a') as f:
-        with open('../res/data/20200613/' + id + '/monte_carlo_time.csv', mode='a') as f:
+        with open('../res/data/20200613/' + id + '/monte_carlo_distance.csv', mode='a') as f:
+        #with open('../res/data/20200613/' + id + '/monte_carlo_time.csv', mode='a') as f:
             str = ''
             for i in range(len(x)):
                 index = Util.point2index((x[i], y[i]), points)
@@ -296,9 +295,9 @@ class Environment():
                 lng = next_state.lng - self.start_point[1]
                 reward += 1.0 / np.sqrt(lat*lat + lng*lng)
             elif self.method == RewardCalcMethod.DISTANCE:
-                reward += self.distance_matrix[next_index][0]
+                reward += 1.0 / float(self.distance_matrix[next_index][0])
             elif self.method == RewardCalcMethod.TIME:
-                reward += self.time_matrix[next_index][0]
+                reward += 1.0 / float(self.time_matrix[next_index][0])
             else:
                 raise Exception('You specified invalid RewardCalcMethod.')
 
