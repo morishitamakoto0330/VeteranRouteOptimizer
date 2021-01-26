@@ -197,8 +197,8 @@ class Util():
 
         # output route to file
         #with open('../res/data/20200613/' + id + '/monte_carlo_straight.csv', mode='a') as f:
-        with open('../res/data/20200613/' + id + '/monte_carlo_distance.csv', mode='a') as f:
-        #with open('../res/data/20200613/' + id + '/monte_carlo_time.csv', mode='a') as f:
+        #with open('../res/data/20200613/' + id + '/monte_carlo_distance.csv', mode='a') as f:
+        with open('../res/data/20200613/' + id + '/monte_carlo_time.csv', mode='a') as f:
             str = ''
             for i in range(len(x)):
                 index = Util.point2index((x[i], y[i]), points)
