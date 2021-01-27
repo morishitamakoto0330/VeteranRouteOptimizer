@@ -46,7 +46,6 @@ class Util():
     def get_points(id):
         points = []
         print("sample route of ID={0} on 2020/6/13 =================================".format(id))
-        #with open('../res/data/20200613/512848/20200613_512848.csv') as f:
         with open('../res/data/20200613/' + id + '/20200613_' + id + '.csv') as f:
             reader = csv.reader(f)
             for index, row in enumerate(reader):
@@ -198,7 +197,10 @@ class Util():
         # output route to file
         #with open('../res/data/20200613/' + id + '/monte_carlo_straight.csv', mode='a') as f:
         #with open('../res/data/20200613/' + id + '/monte_carlo_distance.csv', mode='a') as f:
-        with open('../res/data/20200613/' + id + '/monte_carlo_time.csv', mode='a') as f:
+        #with open('../res/data/20200613/' + id + '/monte_carlo_time.csv', mode='a') as f:
+        #with open('../res/data/20200613/' + id + '/td_straight.csv', mode='a') as f:
+        #with open('../res/data/20200613/' + id + '/td_distance.csv', mode='a') as f:
+        with open('../res/data/20200613/' + id + '/td_time.csv', mode='a') as f:
             str = ''
             for i in range(len(x)):
                 index = Util.point2index((x[i], y[i]), points)
